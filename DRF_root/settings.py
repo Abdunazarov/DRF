@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'translate',
-    'django_ip_geolocation'
+    'django-ip-geolocation'
     ]
 
 # WHITENOISE
