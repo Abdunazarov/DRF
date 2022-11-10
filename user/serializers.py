@@ -1,4 +1,3 @@
-from dataclasses import field
 from urllib import request
 from rest_framework import serializers
 from .models import User

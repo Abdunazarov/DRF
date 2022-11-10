@@ -1,5 +1,3 @@
-from locale import normalize
-from turtle import settiltangle
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
