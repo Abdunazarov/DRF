@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'translate',
-    'django-ip-geolocation'
     ]
 
 # WHITENOISE
@@ -72,9 +71,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.locale.LocaleMiddleware',
-
-    'django_ip_geolocation.middleware.IpGeolocationMiddleware', # geolocation
-
 
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

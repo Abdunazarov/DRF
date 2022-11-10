@@ -112,16 +112,16 @@ def create_blog_front(request):
     return render(request, 'api_app/create_blog.html', {'notification': notification})
 
 
-from django_ip_geolocation.decorators import with_ip_geolocation
 
-@with_ip_geolocation
+from ip2geotools.databases.noncommercial import DbIpCity
+
+
 @api_view(['GET'])
 def visitors_count(request):
     user = request.user
-    location  = request.geolocation
+
 
     address = request.META.get('HTTP_X_FORWARDED_FOR')
-    ip = 'LOX'
 
     if address:
         ip = str(address.split(',')[0])
@@ -129,5 +129,9 @@ def visitors_count(request):
 
     else:
         ip = request.META.get('REMOTE_ADDR')
+
+    data = DbIpCity.get(ip, api_key="free")
+    location = data.country
+    
 
     return Response({'Response': ip, 'location': location})
