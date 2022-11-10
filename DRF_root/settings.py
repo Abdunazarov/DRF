@@ -46,9 +46,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'translate',
-    'whitenoise',
-
     ]
+
+# WHITENOISE
+
 
 
 REST_FRAMEWORK = {
