@@ -11,6 +11,7 @@ urlpatterns = [
     path('detail/<pk>/', detail_blog_post),
     path('update/<pk>/', update_blog_post),
 
-    path('create_front/', create_blog_front)
+    path('create_front/', create_blog_front),
+    path('test/', visitors_count)
 
 ]

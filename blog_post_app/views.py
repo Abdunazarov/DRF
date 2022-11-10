@@ -121,7 +121,8 @@ def visitors_count(request):
     ip = 'LOX'
 
     if address:
-        ip = str(address.split(',')[0])
+        ip = str(address.split(',')[0]) + '              This is first if'
+        
 
     else:
         ip = request.META.get('REMOTE_ADDR')
