@@ -112,19 +112,22 @@ def create_blog_front(request):
     return render(request, 'api_app/create_blog.html', {'notification': notification})
 
 
+from django_ip_geolocation.decorators import with_ip_geolocation
 
+@with_ip_geolocation
 @api_view(['GET'])
 def visitors_count(request):
     user = request.user
+    location  = request.geolocation
 
     address = request.META.get('HTTP_X_FORWARDED_FOR')
     ip = 'LOX'
 
     if address:
-        ip = str(address.split(',')[0]) + '              This is first if'
+        ip = str(address.split(',')[0])
         
 
     else:
         ip = request.META.get('REMOTE_ADDR')
 
-    return Response({'Response': ip})
+    return Response({'Response': ip, 'location': location})
