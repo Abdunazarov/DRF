@@ -1,1 +1,2 @@
-Lower the django version to 3.2 instead of 4, and add required python versoin to runtime
+In order to fix Heroku issues:
+    Lower the django version to 3.2 instead of 4, and add required python versoin to runtime

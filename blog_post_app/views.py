@@ -40,14 +40,14 @@ def create_blog_post(request):
     return Response(serializer.errors)
 
 
-from .get_language import get_language
+from .ru_or_en import ru_or_en
 
 
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def detail_blog_post(request, pk):
 
-    post = get_language(lan=request.LANGUAGE_CODE, pk=pk)
+    post = ru_or_en(lan=request.LANGUAGE_CODE, pk=pk, first_lang_obj=BlogPost, second_lan_obj=BlogPostRus)
     comments = []
     all_comments = BlogPostComments.objects.filter(post=post)
     for comment in all_comments:
@@ -95,43 +95,19 @@ def delete_blog_post(request, pk):
 
 
 
-
-# @api_view(['POST'])
-def create_blog_front(request):
-    notification = False
-
-    if request.method == 'POST':
-        BlogPost.objects.create(
-            author=User.objects.get(id=1),
-            text=request.POST['post_text'], 
-            image=request.POST.get('post_image')
-        )
-        notification = True
-
-
-    return render(request, 'api_app/create_blog.html', {'notification': notification})
-
-
-
 from ip2geotools.databases.noncommercial import DbIpCity
 
-
 @api_view(['GET'])
-def visitors_count(request):
-    user = request.user
-
+def get_country(request):
 
     address = request.META.get('HTTP_X_FORWARDED_FOR')
 
     if address:
         ip = str(address.split(',')[0])
         
-
     else:
         ip = request.META.get('REMOTE_ADDR')
 
-    data = DbIpCity.get(ip, api_key="free")
-    location = data.country
-    
+    location = DbIpCity.get(ip, api_key="free").country    
 
     return Response({'Response': ip, 'location': location})
