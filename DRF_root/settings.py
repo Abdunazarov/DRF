@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'translate',
     ]
 
-# WHITENOISE
+# WHITENOISE IN ORDER TO LOAD CSS IN PRODUCTION 
 
 
 
