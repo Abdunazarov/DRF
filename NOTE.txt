@@ -1,4 +1,6 @@
 In order to fix Heroku issues:
-    Lower the django version to 3.2 instead of 4, and add required python versoin to runtime
+    Lower the django version to 3.2 instead of 4, and add required python version to runtime (3.9.15)
+    Delete the env/, and then MANUALLY install all the libraries
+    (install gunicorn, and add runtime.txt, Procfile)
 
 Install Whitenoise in order to load css in production

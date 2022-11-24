@@ -55,3 +55,19 @@ def get_all_navbar_childs(request):
     serializer = NavbarChildSerializer(all, many=True)
 
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def test(request, account_pk):
+    account = Account.objects.get(id=account_pk)
+    account_allowed_users = account.allowed_users.all()
+
+
+    if request.user in account_allowed_users:
+        return Response({'Response': 'You are allowed to see this account'})
+    
+    return Response({'Response': 'This account is private'})
+    
+
+    
+    

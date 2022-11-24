@@ -4,4 +4,4 @@ from .models import *
 
 admin.site.register(Navbar)
 admin.site.register(NavbarChild)
-
+admin.site.register(Account)

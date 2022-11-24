@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import *
+from .models import Account
 
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -79,8 +80,8 @@ def update_user(request):
 
     if serializer.is_valid():
         updated_user = serializer.update(request.data, user)
-        serializer  = UserSerializer(updated_user)
-        return Response(serializer.data)
+        data = UserSerializer(updated_user).data
+        return Response(data)
 
     return Response(serializer.errors)
 
@@ -101,5 +102,26 @@ def change_password(request):
         return Response(data)
 
     return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_account(request, user_viewed_pk):
+    user_viewed = Account.objects.get(id=user_viewed_pk).user
+    user = request.user
+
+    if user_viewed.private == True:
+        account_followers = user_viewed.followers.all()
+        if Account.objects.get(user=user) in account_followers:
+            data = UserSerializer(user_viewed).data
+            return Response(data)
+
+        return Response({"Response": "This account is private"})
+    
+    data = UserSerializer(user_viewed).data
+    return Response(data)
+
+
+
 
 

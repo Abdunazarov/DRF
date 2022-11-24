@@ -12,17 +12,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework import filters
 
-from django.shortcuts import render
-from api_app.models import ViewCount
-
+# translation 
 
 class BlogPostListView(ListAPIView):
-    search_fields = ['text', 'author__email'] # ForeignKey or ManyToMany field should be filterd this way!
+    search_fields = ['text', 'author__email'] # ForeignKey or ManyToMany field should be filtered this way!
     filter_backends = (filters.SearchFilter,)
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
 
 from .models import User
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -40,27 +39,94 @@ def create_blog_post(request):
     return Response(serializer.errors)
 
 
-from .ru_or_en import ru_or_en
-
-
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 def detail_blog_post(request, pk):
 
-    post = ru_or_en(lan=request.LANGUAGE_CODE, pk=pk, first_lang_obj=BlogPost, second_lan_obj=BlogPostRus)
+    # post = ru_or_en(lan=request.LANGUAGE_CODE, pk=pk, first_lang_obj=BlogPost, second_lan_obj=BlogPostRus)
+    post = get_object_or_404(BlogPost, id=pk)
+    print(post)
     comments = []
     all_comments = BlogPostComments.objects.filter(post=post)
     for comment in all_comments:
         comments.append(comment.id)
 
+    likes = Like.objects.filter(blog_post=post).count()
+    dislikes = Dislike.objects.filter(blog_post=post).count()
+
 
     data = BlogPostSerializer(post).data
     data['comments'] = comments
-
-    if post == None:
-        return Response({'Error': 'No such blog post'})
+    data['likes'] = likes
+    data['dislikes'] = dislikes
 
     return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def like(request, pk):
+    post = get_object_or_404(BlogPost, id=pk)
+    user = request.user
+
+ 
+    if not Like.objects.filter(who_liked=user, blog_post=post).exists():  # !!!!!
+        Like.objects.create(who_liked=user, blog_post=post)
+        return Response({'Response': 'Post liked!'})
+    
+
+    Like.objects.get(who_liked=user, blog_post=post).delete()
+
+    return Response({'Response': 'Like removed from post!'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dislike(request, pk):
+    post = get_object_or_404(BlogPost, id=pk)
+    user = request.user
+ 
+    if not Dislike.objects.filter(who_disliked=user, blog_post=post).exists():  # !!!!!
+        Dislike.objects.create(who_disliked=user, blog_post=post)
+        return Response({'Response': 'Post disliked!'})
+
+
+    Dislike.objects.get(who_disliked=user, blog_post=post).delete()
+    return Response({'Response': 'Dislike removed from post!'})
+
+
+
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_one(request, pk):
+    post = BlogPost.objects.get(id=pk)
+    user = request.user
+
+    try:
+        not_allowed = BlogNotAllowedTo.objects.get(user=user, post=post)
+    
+    except BlogNotAllowedTo.DoesNotExist:
+        not_allowed = False
+        
+    print(not_allowed)
+
+    if not_allowed:
+        return Response({'Response': 'This blog post is private'})
+
+    data = BlogPostSerializer(post).data
+    return Response(data)
+
+
+
+
+
+
+
+
 
 
 @api_view(['PUT'])

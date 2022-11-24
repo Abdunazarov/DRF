@@ -18,13 +18,11 @@ class NavbarChild(models.Model):
 
 
 
-class ViewCount(models.Model):
-    country = models.CharField(max_length=100)
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
+class Account(models.Model):
+    account_name = models.CharField(max_length=155)
+    allowed_users = models.ManyToManyField(User)
 
     def __str__(self):
-        return self.user.email
+        return self.account_name
+
 

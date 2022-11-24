@@ -1,15 +1,18 @@
 from urllib import request
 from rest_framework import serializers
-from .models import User
+from .models import User, Account
+
+from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True) # write_only hides it from showing in Response()
     password = serializers.CharField(write_only=True)
+    followers = serializers.StringRelatedField(many=True, read_only=True) # returns the __str__ method of the object
 
     class Meta:
         model = User
-        fields = ('email', 'name', 'second_name', 'password', 'password2')
+        fields = ('email', 'name', 'second_name', 'password', 'password2', 'followers')
 
     def save(self):
         password = self.validated_data['password']
@@ -52,10 +55,12 @@ class PasswordChangeSerializer(serializers.Serializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
     second_name = serializers.CharField(required=False)
+    follower_remove = serializers.CharField(required=False)
+    follower_add = serializers.CharField(required=False)
 
     class Meta:
         model = User
-        fields = ('name', 'second_name')
+        fields = ('name', 'second_name', 'follower_remove', 'follower_add')
         # extra_kwargs = {
         #     'name': {'required': False},
         #     'first_name': {'required': False}
@@ -64,6 +69,19 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     def update(self, validated_data, instance):
         instance.name = validated_data.get('name', instance.name)
         instance.second_name = validated_data.get('second_name', instance.second_name)
+
+        if validated_data.get('follower_add'):
+            user = get_object_or_404(User, email=validated_data['follower_add']).id
+            follower = Account.objects.get(user=user)
+
+            instance.followers.all = instance.followers.add(follower)
+
+        if validated_data.get('follower_remove'):
+            user = get_object_or_404(User, email=validated_data['follower_remove']).id
+            follower = Account.objects.get(user=user)
+
+            instance.followers.all = instance.followers.remove(follower)
+        
 
         instance.save()
         return instance

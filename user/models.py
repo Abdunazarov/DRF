@@ -28,6 +28,10 @@ class User(AbstractBaseUser):
     name = models.CharField(max_length=200, blank=True, null=True)
     second_name = models.CharField(max_length=200, blank=True)
 
+    followers = models.ManyToManyField("Account", related_name='followers', blank=True)
+    private = models.BooleanField(default=False)
+
+
     is_staff = models.BooleanField(default=False) # whether this user can access the admin
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -49,11 +53,11 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
-        
+
 
 
 class Account(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='the_user')
 
     def __str__(self):
         return str(self.user)
@@ -62,7 +66,7 @@ class Account(models.Model):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_account(sender, instance=None, created=False, **kwargs):
     if created:
-        Account.objects.create(user=instance)
+        Account.objects.create(id=instance.id, user=instance)
 
 
 

@@ -10,4 +10,6 @@ urlpatterns = [
     path('navbar_child/create/', create_navabar_child),
     path('navbar_child/all/', get_all_navbar_childs),
 
+    path('test/<account_pk>/', test),
+
 ]
