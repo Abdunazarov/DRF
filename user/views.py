@@ -70,13 +70,16 @@ def logout_view(request):
     return Response(data)
 
 
-
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_user(request):
     user = request.user
 
+    if len(request.data) < 1:
+        return Response({'Response': 'You did not update anything'})
+
     serializer = UserUpdateSerializer(instance=user, data=request.data)
+
 
     if serializer.is_valid():
         updated_user = serializer.update(request.data, user)

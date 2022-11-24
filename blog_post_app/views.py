@@ -54,11 +54,11 @@ def detail_blog_post(request, pk):
     likes = Like.objects.filter(blog_post=post).count()
     dislikes = Dislike.objects.filter(blog_post=post).count()
 
-
     data = BlogPostSerializer(post).data
-    data['comments'] = comments
     data['likes'] = likes
     data['dislikes'] = dislikes
+    data['comments'] = comments
+
 
     return Response(data)
 
@@ -98,37 +98,6 @@ def dislike(request, pk):
 
 
 
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_one(request, pk):
-    post = BlogPost.objects.get(id=pk)
-    user = request.user
-
-    try:
-        not_allowed = BlogNotAllowedTo.objects.get(user=user, post=post)
-    
-    except BlogNotAllowedTo.DoesNotExist:
-        not_allowed = False
-        
-    print(not_allowed)
-
-    if not_allowed:
-        return Response({'Response': 'This blog post is private'})
-
-    data = BlogPostSerializer(post).data
-    return Response(data)
-
-
-
-
-
-
-
-
-
-
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_blog_post(request, pk):
@@ -139,6 +108,9 @@ def update_blog_post(request, pk):
 
     resp = {'Response': 'Failed to update'}
     serializer = BlogPostSerializer(post, data=request.data)
+    
+    if len(request.data) < 1:
+        return Response({'Response': 'You did not edit this post'})
 
     if serializer.is_valid():
         serializer.save()
@@ -152,13 +124,29 @@ def update_blog_post(request, pk):
 @permission_classes([IsAuthenticated])
 def delete_blog_post(request, pk):
     post = get_object_or_404(BlogPost, id=pk)
-    resp = {'Response': 'Failed to delete'}
+    resp = {'Response': 'Failed to delete / You are not the author'}
 
     if request.user == post.author and post.delete():
         resp['Response'] = 'Successfully deleted'
     
     return Response(resp)
 
+
+# Comment CRUD
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_comment(request, post_pk):
+    post = get_object_or_404(BlogPost, id=post_pk)
+    user = request.user
+
+    serializer = BlogPostCommentsSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save(request.data, post, user)
+        return Response(serializer.data)
+
+    return Response(serializer.errors)
 
 
 from ip2geotools.databases.noncommercial import DbIpCity

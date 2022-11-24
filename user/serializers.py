@@ -6,13 +6,14 @@ from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(required=True)
     password2 = serializers.CharField(write_only=True) # write_only hides it from showing in Response()
     password = serializers.CharField(write_only=True)
     followers = serializers.StringRelatedField(many=True, read_only=True) # returns the __str__ method of the object
 
     class Meta:
         model = User
-        fields = ('email', 'name', 'second_name', 'password', 'password2', 'followers')
+        fields = ('id', 'email', 'name', 'second_name', 'password', 'password2', 'private', 'followers')
 
     def save(self):
         password = self.validated_data['password']
@@ -57,10 +58,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     second_name = serializers.CharField(required=False)
     follower_remove = serializers.CharField(required=False)
     follower_add = serializers.CharField(required=False)
+    private = serializers.BooleanField(required=False)
 
     class Meta:
         model = User
-        fields = ('name', 'second_name', 'follower_remove', 'follower_add')
+        fields = ('name', 'second_name', 'follower_remove', 'follower_add', 'private')
         # extra_kwargs = {
         #     'name': {'required': False},
         #     'first_name': {'required': False}
@@ -69,6 +71,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     def update(self, validated_data, instance):
         instance.name = validated_data.get('name', instance.name)
         instance.second_name = validated_data.get('second_name', instance.second_name)
+        instance.private = validated_data.get('private', instance.private)
 
         if validated_data.get('follower_add'):
             user = get_object_or_404(User, email=validated_data['follower_add']).id

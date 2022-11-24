@@ -3,7 +3,7 @@ from user.models import User
         
 
 class BlogPost(models.Model):
-    text = models.TextField(blank=True)
+    text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(default=None, null=True, blank=True)
 
