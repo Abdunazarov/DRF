@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'blog_post_app',
     'user',
+    'test_app',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -156,3 +157,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('MY_EMAIL')
+EMAIL_HOST_PASSWORD = "snktgjbsikpsvyal" # os.environ .bash_profile
+DEFAULT_FROM_EMAIL = os.environ.get('MY_EMAIL')

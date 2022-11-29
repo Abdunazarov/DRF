@@ -14,6 +14,11 @@ urlpatterns = [
     path('update/', update_user),
     path('change_password/', change_password),
 
-    path('account/<user_viewed_pk>/', view_account)
+    path('account/<user_viewed_pk>/', view_account),
+
+    # password reset
+    path('send_code/', send_code),
+
+    path('reset_password/', reset_password),
 
 ]

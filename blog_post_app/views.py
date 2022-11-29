@@ -165,3 +165,5 @@ def get_country(request):
     location = DbIpCity.get(ip, api_key="free").country    
 
     return Response({'Response': ip, 'location': location})
+
+

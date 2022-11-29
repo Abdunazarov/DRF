@@ -95,7 +95,7 @@ def update_user(request):
 @permission_classes([IsAuthenticated])
 def change_password(request):
     user = request.user
-    data = {'Response': 'Failed to updated password'}
+    data = {'Response': 'Failed to update password'}
 
     serializers = PasswordChangeSerializer(user, data=request.data)
 
@@ -110,6 +110,7 @@ def change_password(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_account(request, user_viewed_pk):
+
     user_viewed = Account.objects.get(id=user_viewed_pk).user
     user = request.user
 
@@ -127,4 +128,36 @@ def view_account(request, user_viewed_pk):
 
 
 
+@api_view(['POST'])
+# @permission_classes([AllowAny])
+def send_code(request):
 
+    serializer = SendCodeSerializer(data=request.data)
+
+    if serializer.is_valid():
+        code = serializer.validate_and_send(request_data=request.data)
+
+        response = Response({'Success': 'Code sent to email'})
+        response.set_cookie('user', serializer.data['email'])
+        response.set_cookie('code', code)
+
+        return response
+    
+    return response
+
+from datetime import datetime
+
+@api_view(['POST'])
+def reset_password(request):
+
+    serializer = ResetPasswordSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.check_save(request.data, request.COOKIES['code'], request.COOKIES['user'])
+        response = Response({'Response': 'Successfully updated password'})
+        response.delete_cookie('user')
+        response.delete_cookie('code')
+
+        return response
+
+    return Response({'Response': 'Failed to update password'})

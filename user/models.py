@@ -29,8 +29,8 @@ class User(AbstractBaseUser):
     second_name = models.CharField(max_length=200, blank=True)
 
     followers = models.ManyToManyField("Account", related_name='followers', blank=True)
+    followings = models.ManyToManyField("Account", related_name='followings', blank=True)
     private = models.BooleanField(default=False)
-
 
     is_staff = models.BooleanField(default=False) # whether this user can access the admin
     is_active = models.BooleanField(default=True)
